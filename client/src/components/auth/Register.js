@@ -1,12 +1,17 @@
 import React, { useState } from "react"
+import PropTypes from "prop-types"
 import axios from "axios"
+import { connect } from "react-redux"
+import { registerUser } from "../../actions/authActions"
 
-function Register() {
+function Register(props) {
 	const [name, setName] = useState("")
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
 	const [password2, setPassword2] = useState("")
+
 	const [errors, setErrors] = useState({})
+	const { user } = props.auth
 
 	const onSubmit = (e) => {
 		e.preventDefault()
@@ -18,14 +23,17 @@ function Register() {
 			password2,
 		}
 
-		axios
-			.post("/api/users/register", newUser)
-			.then((res) => console.log(res.data))
-			.catch((err) => setErrors(err.response.data))
+		props.registerUser(newUser)
+
+		// axios
+		// 	.post("/api/users/register", newUser)
+		// 	.then((res) => console.log(res.data))
+		// 	.catch((err) => setErrors(err.response.data))
 	}
 
 	return (
 		<div className="register">
+			{user ? user.name : null}
 			<div className="container">
 				<div className="row">
 					<div className="col-md-8 m-auto">
@@ -126,4 +134,13 @@ function Register() {
 	)
 }
 
-export default Register
+Register.propTypes = {
+	registerUser: PropTypes.func.isRequired,
+	auth: PropTypes.object.isRequired,
+}
+
+const mapStateProps = (state) => ({
+	auth: state.auth,
+})
+
+export default connect(mapStateProps, { registerUser })(Register)
